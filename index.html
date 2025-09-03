@@ -14,7 +14,7 @@
         </header>
         <main>
             <div class="input-section">
-                <h2>輸入參數</h2>
+                <!-- <h2>輸入參數</h2> -->
                 <div class="form-grid">
                     <div class="input-group">
                         <label for="investmentAmount">投資金額 (HKD)</label>
@@ -26,15 +26,31 @@
                     </div>
                     <div class="input-group">
                         <label for="hkdRate">港元定期年利率 (%)</label>
-                        <input type="number" id="hkdRate" value="4.0" step="0.1" placeholder="例如：4.0">
+                        <input type="number" id="hkdRate" value="2.0" step="0.1" placeholder="例如：4.0">
                     </div>
                     <div class="input-group">
                         <label for="usBondRate">美債年利率 (%)</label>
-                        <input type="number" id="usBondRate" value="5.0" step="0.1" placeholder="例如：5.0">
+                        <input type="number" id="usBondRate" value="4.0" step="0.1" placeholder="例如：5.0">
                     </div>
                     <div class="input-group">
-                        <label for="exchangeCost">匯率兌換成本 (%)</label>
-                        <input type="number" id="exchangeCost" value="0.3" step="0.01" placeholder="例如：0.1">
+                        <label for="exchangeCost">匯率兌換成本</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="exchangeCost" value="32" step="1">
+                            <select id="exchangeCostType">
+                                <option value="amount" selected>HKD</option>
+                                <option value="percent">%</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="usBondFee">美債手續費</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="usBondFee" value="50" step="1">
+                            <select id="usBondFeeType">
+                                <option value="amount" selected>HKD</option>
+                                <option value="percent">%</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <button id="calculateBtn">計算</button>

@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const hkdRateEl = document.getElementById('hkdRate');
     const usBondRateEl = document.getElementById('usBondRate');
     const exchangeCostEl = document.getElementById('exchangeCost');
+    const usBondFeeEl = document.getElementById('usBondFee');
 
     const outputSection = document.getElementById('outputSection');
     const resultTextEl = document.getElementById('resultText');
@@ -21,10 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentExchangeRate = parseFloat(exchangeRateEl.value);
         const hkdRate = parseFloat(hkdRateEl.value) / 100;
         const usBondRate = parseFloat(usBondRateEl.value) / 100;
-        const exchangeCost = parseFloat(exchangeCostEl.value) / 100;
+        const exchangeCostVal = parseFloat(exchangeCostEl.value);
+        const exchangeCostType = document.getElementById('exchangeCostType').value;
+        const usBondFeeVal = parseFloat(usBondFeeEl.value);
+        const usBondFeeType = document.getElementById('usBondFeeType').value;
+
 
         // 2. Input validation
-        if (isNaN(investmentAmount) || isNaN(currentExchangeRate) || isNaN(hkdRate) || isNaN(usBondRate) || isNaN(exchangeCost) || investmentAmount <= 0) {
+        if (isNaN(investmentAmount) || isNaN(currentExchangeRate) || isNaN(hkdRate) || isNaN(usBondRate) || isNaN(exchangeCostVal) || isNaN(usBondFeeVal) || investmentAmount <= 0) {
             alert('請輸入所有有效的數字。投資金額必須大於零。');
             return;
         }
@@ -34,15 +39,37 @@ document.addEventListener('DOMContentLoaded', () => {
         // This is the risk that HKD strengthens to 7.75 when converting back.
         const exchangeFluctuation = (LERS_WEAK_SIDE_GUARANTEE / currentExchangeRate) - 1;
 
-        // Total cost of round-trip exchange
-        const roundTripCost = investmentAmount * (1 - Math.pow(1 - exchangeCost, 2));
+        // Calculate one-time costs based on input type (amount or percent)
+        let roundTripExchangeCost;
+        let exchangeCostFormula;
+        if (exchangeCostType === 'amount') {
+            roundTripExchangeCost = exchangeCostVal;
+            exchangeCostFormula = `${roundTripExchangeCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} HKD (固定金額)`;
+        } else { // percent
+            const exchangeCostPercent = exchangeCostVal / 100;
+            roundTripExchangeCost = investmentAmount * (1 - Math.pow(1 - exchangeCostPercent, 2));
+            exchangeCostFormula = `${investmentAmount.toLocaleString()} * [1 - (1 - ${exchangeCostVal}%)^2] = ${roundTripExchangeCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} HKD`;
+        }
+
+        let usBondFeeCost;
+        let usBondFeeFormula;
+        if (usBondFeeType === 'amount') {
+            usBondFeeCost = usBondFeeVal;
+            usBondFeeFormula = `${usBondFeeCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} HKD (固定金額)`;
+        } else { // percent
+            const usBondFeePercent = usBondFeeVal / 100;
+            usBondFeeCost = investmentAmount * usBondFeePercent;
+            usBondFeeFormula = `${investmentAmount.toLocaleString()} * ${usBondFeeVal}% = ${usBondFeeCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} HKD`;
+        }
+        
+        const totalOneTimeCost = roundTripExchangeCost + usBondFeeCost;
         
         // Calculate effective annual return rate for US bonds in HKD, considering risk
         const effectiveUsRateInHkd = (1 + usBondRate) * (1 + exchangeFluctuation) - 1;
         
         const annualHkdReturn = investmentAmount * hkdRate;
         // Annual US net return includes interest, currency fluctuation, and exchange costs
-        const annualUsNetReturnInHkd = (investmentAmount * effectiveUsRateInHkd) - roundTripCost;
+        const annualUsNetReturnInHkd = (investmentAmount * effectiveUsRateInHkd) - totalOneTimeCost;
 
 
         let resultMessage = '';
@@ -56,10 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
             <p>變動率 = (7.75 / ${currentExchangeRate}) - 1 = ~${(exchangeFluctuation * 100).toFixed(4)}%</p>
             <p>3. 美債投資的綜合年回報率 (已計入匯率風險):</p>
             <p>[(1 + ${usBondRate * 100}%) * (1 + ${(exchangeFluctuation * 100).toFixed(4)}%) - 1] = ~${(effectiveUsRateInHkd * 100).toFixed(4)}%</p>
-            <p>4. 計算來回總匯率成本:</p>
-            <p>${investmentAmount.toLocaleString()} * [1 - (1 - ${exchangeCost * 100}%)^2] = ${roundTripCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} HKD</p>
+            <p>4. 計算總一次性成本 (來回匯率成本 + 美債手續費):</p>
+            <p>匯率成本: ${exchangeCostFormula}</p>
+            <p>美債手續費: ${usBondFeeFormula}</p>
+            <p>總成本: ${totalOneTimeCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} HKD</p>
             <p>5. 美債投資的淨年收益 (扣除所有成本):</p>
-            <p>(${investmentAmount.toLocaleString()} * ${effectiveUsRateInHkd.toLocaleString()}) - ${roundTripCost.toLocaleString()} = ${annualUsNetReturnInHkd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} HKD</p>
+            <p>(${investmentAmount.toLocaleString()} * ${effectiveUsRateInHkd.toLocaleString()}) - ${totalOneTimeCost.toLocaleString()} = ${annualUsNetReturnInHkd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} HKD</p>
         `;
         
         calculationStepsEl.innerHTML = stepsHtml;
@@ -70,10 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
             resultMessage = '即使不考慮匯率成本，美債的有效年回報率也已低於或等於港元定期。';
         } else {
             // 計算收益打和點（break-even point）
-            // I * effectiveUsRateInHkd * t - roundTripCost = I * hkdRate * t
-            // t * (I * effectiveUsRateInHkd - I * hkdRate) = roundTripCost
-            // t = roundTripCost / (I * (effectiveUsRateInHkd - hkdRate))
-            const breakEvenTimeYears = roundTripCost / (investmentAmount * (effectiveUsRateInHkd - hkdRate));
+            // I * effectiveUsRateInHkd * t - totalOneTimeCost = I * hkdRate * t
+            // t * (I * effectiveUsRateInHkd - I * hkdRate) = totalOneTimeCost
+            // t = totalOneTimeCost / (I * (effectiveUsRateInHkd - hkdRate))
+            const breakEvenTimeYears = totalOneTimeCost / (investmentAmount * (effectiveUsRateInHkd - hkdRate));
 
             if (breakEvenTimeYears <= 0) {
                 // 如果打和點小於或等於零，表示美債從一開始就更有利
@@ -99,10 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
         outputSection.style.display = 'block';
 
         // 4. Generate Chart
-        updateChart(investmentAmount, hkdRate, usBondRate, exchangeCost, exchangeFluctuation);
+        updateChart(investmentAmount, hkdRate, usBondRate, exchangeFluctuation, totalOneTimeCost);
     });
 
-    function updateChart(investment, hkdRate, usBondRate, exCost, exFluctuation) {
+    function updateChart(investment, hkdRate, usBondRate, exFluctuation, totalOneTimeCost) {
         const maxMonths = 24; // 2 years
         const labels = Array.from({ length: maxMonths + 1 }, (_, i) => {
              if (i === 0) return '起點';
@@ -111,8 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
              return `${i}個月`;
         });
         
-        const roundTripCost = investment * (1 - Math.pow(1 - exCost, 2));
-
         const hkdData = Array.from({ length: maxMonths + 1 }, (_, i) => {
             const t = i / 12; // time in years
             return investment * hkdRate * t;
@@ -123,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const usBondDataLinear = Array.from({ length: maxMonths + 1 }, (_, i) => {
             const t = i / 12; // time in years
             const totalReturn = investment * effectiveUsRateInHkd * t;
-            const netReturn = totalReturn - roundTripCost;
+            const netReturn = totalReturn - totalOneTimeCost;
             return i === 0 ? 0 : (netReturn > 0 ? netReturn : 0);
         });
 
