@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投資回報計算器：美債 vs. 港元定期</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>投資回報計算器</h1>
+            <p>比較投資於美國國債與港元定期存款的回報</p>
+        </header>
+        <main>
+            <div class="input-section">
+                <h2>輸入參數</h2>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="investmentAmount">投資金額 (HKD)</label>
+                        <input type="number" id="investmentAmount" value="100000" placeholder="例如：100000">
+                    </div>
+                    <div class="input-group">
+                        <label for="exchangeRate">港元兌美元匯率</label>
+                        <input type="number" id="exchangeRate" value="7.8" step="0.001" placeholder="例如：7.8">
+                    </div>
+                    <div class="input-group">
+                        <label for="hkdRate">港元定期年利率 (%)</label>
+                        <input type="number" id="hkdRate" value="4.0" step="0.1" placeholder="例如：4.0">
+                    </div>
+                    <div class="input-group">
+                        <label for="usBondRate">美債年利率 (%)</label>
+                        <input type="number" id="usBondRate" value="5.0" step="0.1" placeholder="例如：5.0">
+                    </div>
+                    <div class="input-group">
+                        <label for="exchangeCost">匯率兌換成本 (%)</label>
+                        <input type="number" id="exchangeCost" value="0.3" step="0.01" placeholder="例如：0.1">
+                    </div>
+                </div>
+                <button id="calculateBtn">計算</button>
+            </div>
+
+            <div class="output-section" id="outputSection" style="display: none;">
+                <h2>計算結果</h2>
+                <p id="resultText"></p>
+                <div class="calculation-steps" id="calculationSteps">
+                    <!-- Calculation steps will be inserted here by JavaScript -->
+                </div>
+                <div class="chart-container">
+                    <canvas id="returnChart"></canvas>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <p>免責聲明：本計算結果僅供參考，不構成任何投資建議。</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
