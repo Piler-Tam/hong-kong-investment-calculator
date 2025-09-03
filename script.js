@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const t = i / 12; // time in years
             const totalReturn = investment * effectiveUsRateInHkd * t;
             const netReturn = totalReturn - totalOneTimeCost;
-            return i === 0 ? 0 : (netReturn > 0 ? netReturn : 0);
+            return netReturn;
         });
 
 
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             display: true,
                             text: '總收益 (HKD)'
                         },
-                        beginAtZero: true
+                        beginAtZero: false
                     }
                 }
             }
